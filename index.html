@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>CoachesPortal</title>
+        <link rel="stylesheet" href="css/portal.css">
+        <link rel="stylesheet" href="css/home.css">
+        <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+        <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+        <!-- Chart.js FIRST -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+        <!-- Your JS AFTER -->
+        <script src="js/home.js" defer></script>
+
+
+    </head>
+    <body class="portal-body">
+        <div class="team-logo">
+            <img src="Images/DeltonaHighwolfheadsmall.webp" alt="Deltona Wolves Logo">
+            <h1>DELTONA WOLVES</h1>
+        </div>
+        <hr class="portal-headerdivider">
+        <div class="portal-layout">
+            <nav class="portal-sidepanel">
+                <a href="index.html" class="nav-item">
+                    <i data-lucide="house"></i> Home
+                </a>
+                <a href= "/roster.html" class="nav-item">
+                    <i data-lucide="trophy"></i> Roster
+                </a>
+                <a href="/schedule.html" class="nav-item">
+                    <i data-lucide="calendar-clock"></i>Schedule
+                </a>
+                <a href="/stats.html" class="nav-item">
+                    <i data-lucide="chart-bar-big"></i> Stats
+                </a>
+                <a href="/settings.html" class="nav-item">
+                    <i data-lucide="settings"></i> Settings
+                </a>
+            </nav>
+            <main class="home-main">
+                <h1 class="home-coachportal">Coaches Portal</h1>
+                <!-- Metrics Data Below -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h2>Win/Loss Record</h2>
+                        <p>3 - 1</p>
+                    </div>
+                    <div class="metric-card">
+                        <h2>Next Opponent</h2>
+                        <p>Rivertown Hawks</p>
+                    </div>
+                    <div class="metric-card chart-card">
+                        <div class="chart-header">
+                            <canvas id="stat-chart"></canvas>
+                            <div class="chart-buttons">
+                                <button onclick="changeChart('ppg')">PPG</button>
+                                <button onclick="changeChart('tov')">TOV</button>
+                                <button onclick="changeChart('rdz')">RDZ</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="metric-card chart-card">
+                        <div class="standings-header">
+                            <h2 class="standings-title">Division Standings</h2>
+                            <div class="stand-buttons">
+                                <button onclick="changeStand('div')">DIV</button>
+                                <button onclick="changeStand('lge')">LGE</button>
+                            </div>
+                        </div>
+                        <div id="standings-table"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <script>lucide.createIcons();</script>
+    </body>
+</html>
