@@ -1,5 +1,26 @@
 {
   "dependencies": {
+    "dotenv": "^17.3.1",
     "tabulator-tables": "^6.3.1"
-  }
+  },
+  "name": "coachesdashboard",
+  "version": "1.0.0",
+  "description": "A simple coaches dashboard with UCaaS (Simulated or Real-World API)",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tylebos/CoachesDashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tylebos/CoachesDashboard/issues"
+  },
+  "homepage": "https://github.com/Tylebos/CoachesDashboard#readme"
 }
