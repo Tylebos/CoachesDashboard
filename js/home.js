@@ -1,3 +1,19 @@
+/**
+ * Author: Tyler Bosford
+ * Project: Coaches Dashboard
+ * Date Started: 19 Jan 2026
+ * Date Modified: 3 March 2026
+ * File: home.js
+ * Description:
+ *      Front end JS for the home page. Manage Chart.JS, fetch
+ *      record and table data.
+ * github: Tylebos
+ */
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Chart.JS
+////////////////////////////////////////////////////////////////////////////////////////////
+
 const ctx = document.getElementById('stat-chart').getContext('2d');
 
 // Static data for each chart
@@ -63,8 +79,13 @@ let statChart = new Chart(ctx, {
         }
     }
 }) 
-
-// Function to change the chart
+/**
+ * Function: changeChart
+ * Purpose:
+ *      Allow the user to dynamically change the charts display
+ * @param: A statKey to determine which chart to display
+ * @return: None
+ */
 function changeChart(statKey) {
     const stat = chartData[statKey];
 
@@ -108,8 +129,9 @@ function changeChart(statKey) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// Table
+// Tabulator
 ////////////////////////////////////////////////////////////////////////////////////////////
+
 var divisionData = [
     {Standing: 1, TeamCity: "Mainland", TeamName: "Bucanneers", W: 4, L: 0},
     {Standing: 2, TeamCity: "Deland", TeamName: "Bulldogs", W: 3, L: 1},
@@ -149,8 +171,13 @@ let standingsTable = new Tabulator("#standings-table", {
         }
     }
 });
-
-// Function to change tables
+/**
+ * Function: changeStand
+ * Purpose:
+ *      Change the display of the league and division standings for the user
+ * @param: type of table
+ * @return: None
+ */
 function changeStand(type) {
     if (type == "div") {
         standingsTable.replaceData(divisionData);
@@ -158,6 +185,31 @@ function changeStand(type) {
     } else if (type == "lge") {
         standingsTable.replaceData(leagueData);
         document.querySelector(".standings-title").textContent = "League Standings";
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// RECORD & NEXT OPPONENT
+////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Function: loadTeamRecord
+ * Purpose:
+ *      fetch teams record from coaches database via API
+ * @param: teamID
+ * @return: none
+ */
+async function loadTeamRecord(teamID) {
+    try {
+        const res = await fetch(`/api/teams/${teamID}/record`); // Pause until fetch complete
+        if (!res.ok) {
+            throw new Error(`HTTP Error! status code: ${res.status}`);
+        }
+        const record = await res.json(); // wait for the response
+
+        const recordEl = document.querySelector('.win-loss');
+        recordEl.textContent = `${record.Wins} - ${record.Losses}`;
+    } catch (err) {
+        console.error("Failed to load team record: ", err);
     }
 }
 

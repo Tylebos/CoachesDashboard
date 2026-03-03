@@ -14,7 +14,6 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
         <!-- Your JS AFTER -->
-        <script src="js/home.js" defer></script>
 
 
     </head>
@@ -38,8 +37,8 @@
                 <a href="pages/stats.html" class="nav-item">
                     <i data-lucide="chart-bar-big"></i> Stats
                 </a>
-                <a href="pages/settings.html" class="nav-item">
-                    <i data-lucide="settings"></i> Settings
+                <a href="pages/games.html" class="nav-item">
+                    <i data-lucide="medal"></i> Games
                 </a>
             </nav>
             <main class="home-main">
@@ -48,11 +47,11 @@
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <h2>Win/Loss Record</h2>
-                        <p>3 - 1</p>
+                        <p class="win-loss"></p>
                     </div>
                     <div class="metric-card">
                         <h2>Next Opponent</h2>
-                        <p>Rivertown Hawks</p>
+                        <p class="next-opp">Rivertown Hawks</p>
                     </div>
                     <div class="metric-card chart-card">
                         <div class="chart-header">
@@ -78,5 +77,10 @@
             </main>
         </div>
         <script>lucide.createIcons();</script>
+        <script src="js/home.js"></script>
+        <script>
+            const teamID = 1;
+            loadTeamRecord(teamID);
+        </script>
     </body>
 </html>

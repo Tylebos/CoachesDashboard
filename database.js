@@ -9,10 +9,39 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise() // Allows for async functions
 
-async function getTeams() {
-    const [rows] = await pool.query("SELECT * FROM Teams")
-    return rows
+export async function getRecord(TeamID) {
+    const query = `
+        SELECT 
+            SUM(CASE WHEN TeamScore > OpponentScore THEN 1 ELSE 0 END) AS Wins,
+            SUM(CASE WHEN TeamScore < OpponentScore THEN 1 ELSE 0 END) AS Losses,
+            SUM(CASE WHEN TeamScore = OpponentScore THEN 1 ELSE 0 END) AS Ties
+        FROM Games
+        WHERE TeamID = ?
+    `
+    const [rows] = await pool.query(query, [TeamID]) // Pause here for query to finish
+    return rows;
 }
 
-const teams = await getTeams()
-console.log(teams)
+export async function getGames(TeamID) {
+    const query = `
+        SELECT CONCAT(t2.TeamCity, " ", t2.TeamName) AS OpponentName, g.Location, g.GameDate, g.GameTime, g.GameType,
+            COALESCE(
+            CASE 
+                WHEN g.TeamScore IS NULL OR g.OpponentScore IS NULL THEN NULL
+                WHEN g.TeamScore > g.OpponentScore THEN 'W'
+                WHEN g.TeamScore < g.OpponentScore THEN 'L'
+                WHEN g.TeamScore = g.OpponentScore THEN 'T'
+                END,
+                'TBD'
+            ) AS Result
+        FROM CoachesDashboard.Games g 
+        INNER JOIN CoachesDashboard.Teams t 
+            ON t.TeamID = g.TeamID 
+        INNER JOIN CoachesDashboard.Teams t2
+            ON t2.TeamID = g.OpponentID 
+        WHERE g.TeamID = ?
+        ORDER BY g.GameDate 
+    `
+    const [rows] = await pool.query(query, [TeamID])
+    return rows
+}
