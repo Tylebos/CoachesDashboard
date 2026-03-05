@@ -1,0 +1,127 @@
+/* Full page setup */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(
+    -45deg,
+    #020617,
+    #0f172a,
+    #1e293b,
+    #475569,
+    #cbd5f5,
+    #475569,
+    #1e293b
+  );
+  background-size: 400% 400%;
+  animation: gradientBG 18s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 0% 50%; }
+}
+
+/* Header at the top */
+.site-header {
+    width: 100%;
+    padding: 15px 0;
+    background-color: rgba(0, 0, 0, 0.6); /* semi-transparent dark overlay */
+    color: white;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 3.0rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Center login form below header — slightly less space now */
+.login-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding-top: 60px; /* was 80px, now nudged up 20px */
+}
+
+/* Optional: slightly reduce margin on container */
+.login-container {
+    width: 320px;
+    padding: 60px;
+    background-color: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    margin-top: 10px; /* was 20px, slightly closer to header/title */
+}
+
+@keyframes fadeOutUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px); /* moves up */
+  }
+}
+
+#login-welcome {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1e3a8a;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Login heading */
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1e3a8a;
+}
+
+/* Inputs and button */
+.login-container input, .login-container button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+.login-container button {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+}
+
+
+.login-container button:hover {
+    background-color: #3b82f6;
+}

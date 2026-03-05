@@ -5,13 +5,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>CoachesPortal</title>
         <link rel="stylesheet" href="../css/portal.css">
-        <link rel="stylesheet" href="../css/game.css">
         <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
         <script src="https://unpkg.com/lucide@latest"></script>
         <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
         <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
         <!-- Chart.js FIRST -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+        <!-- Your JS AFTER -->
+
 
     </head>
     <body class="portal-body">
@@ -22,7 +24,7 @@
         <hr class="portal-headerdivider">
         <div class="portal-layout">
             <nav class="portal-sidepanel">
-                <a href="../index.html" class="nav-item">
+                <a href="home.html" class="nav-item">
                     <i data-lucide="house"></i> Home
                 </a>
                 <a href= "roster.html" class="nav-item">
@@ -38,22 +40,7 @@
                     <i data-lucide="medal"></i> Games
                 </a>
             </nav>
-            <main class="games-main">
-                <h1 class="games-title"></h1>
-                <script>
-                    // Add current year to title
-                    const titleEl = document.querySelector('.games-title');
-                    const currentYear = new Date().getFullYear();
-                    titleEl.textContent = `${currentYear} Season`;
-                </script>
-                <div id="games-table"></div>
-            </main>
         </div>
-        <script src="/js/games.js"></script>
-        <script>
-            const teamID = 1;
-            loadGames(teamID)
-        </script>
         <script>lucide.createIcons();</script>
     </body>
 </html>

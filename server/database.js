@@ -45,3 +45,34 @@ export async function getGames(TeamID) {
     const [rows] = await pool.query(query, [TeamID])
     return rows
 }
+
+export async function getTeams() {
+    const query = `
+        SELECT TeamID, CONCAT(TeamCity, " ", TeamName) AS Name
+        FROM Teams
+        ORDER BY Name;
+    `;
+    const [rows] = await pool.query(query);
+    return rows;
+}
+
+export async function addGame(gameData, teamID) {
+    const query = `
+        INSERT INTO Games (TeamID, OpponentID, Location, GameDate, GameTime, OpponentScore, TeamScore, GameType) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    `;
+    
+    const result = await pool.query(query, [
+        teamID,
+        gameData.opponentID,
+        gameData.location,
+        gameData.gameDate,
+        gameData.gameTime,
+        gameData.opponentScore,
+        gameData.teamScore,
+        gameData.gameType
+    ]);
+
+    return result.insertId;
+
+}
