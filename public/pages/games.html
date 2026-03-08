@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <title>CoachesPortal</title>
-        <link rel="stylesheet" href="../css/portal.css">
-        <link rel="stylesheet" href="../css/game.css">
+        <link rel="stylesheet" href="../assets/css/portal.css">
+        <link rel="stylesheet" href="../assets/css/game.css">
         <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
         <script src="https://unpkg.com/lucide@latest"></script>
         <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
@@ -15,79 +15,79 @@
 
     </head>
     <body class="portal-body">
-        <div class="team-logo">
-            <img src="../Images/DeltonaHighwolfheadsmall.webp" alt="Deltona Wolves Logo">
-            <h1>DELTONA WOLVES</h1>
-        </div>
-        <hr class="portal-headerdivider">
-        <div class="portal-layout">
-            <nav class="portal-sidepanel">
-                <a href="../index.html" class="nav-item">
-                    <i data-lucide="house"></i> Home
-                </a>
-                <a href= "roster.html" class="nav-item">
-                    <i data-lucide="trophy"></i> Roster
-                </a>
-                <a href="schedule.html" class="nav-item">
-                    <i data-lucide="calendar-clock"></i>Schedule
-                </a>
-                <a href="stats.html" class="nav-item">
-                    <i data-lucide="chart-bar-big"></i> Stats
-                </a>
-                <a href="games.html" class="nav-item">
-                    <i data-lucide="medal"></i> Games
-                </a>
-            </nav>
-            <main class="games-main">
-                <h1 class="games-title"></h1>
-                <script>
-                    // Add current year to title
-                    const titleEl = document.querySelector('.games-title');
-                    const currentYear = new Date().getFullYear();
-                    titleEl.textContent = `${currentYear} Season`;
-                </script>
-                <div id="games-table"></div>
-                <button type="button" id="open-modal-btn">Add Game</button>
-                <div id="game-modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-btn">&times;</span>
-                        <h2 id="game-title">Add New Game</h2>
-                        <form id="game-form">
-                            <label>Opponent:</label>
-                            <select id="opponent-select" name="OpponentID" required>
-                                <option value="">Select Opponent</option>
-                            </select>
-                            <label>Location:</label>
-                            <input type="text" name="Location" required>
-                            <label>Date:</label>
-                            <input type="date" name="GameDate" required>
-                            <label>Time:</label>
-                            <input type="time" name="GameTime" value="12:00">
-                            <label>TeamScore</label>
-                            <input type="number" name="TeamScore" min="0">
-                            <label>OpponentScore</label>
-                            <input type="number" name="OpponentScore" min="0">
-                            <label>GameType</label>
-                           <select name="GameType">
-                                <option value="PreSeason.">PreSeason</option>
-                                <option value="Regular Season">Regular Season</option>
-                                <option value="Playoff">Playoff</option>
-                                <option value="District">District</option>
-                                <option value="State Championship">State Championship</option>
-                            </select>
-                        </form>
-                        <button type="submit" id="submit-btn">Add Game</button>
-                        <button type="reset" id="reset-btn">Clear Values</button>
+        <div id="page-container" style="display: none;">
+            <div class="team-logo">
+                <img src="../Images/DeltonaHighwolfheadsmall.webp" alt="Deltona Wolves Logo">
+                <h1>DELTONA WOLVES</h1>
+            </div>
+            <hr class="portal-headerdivider">
+            <div class="portal-layout">
+                <nav class="portal-sidepanel">
+                    <a href="home" class="nav-item">
+                        <i data-lucide="house"></i> Home
+                    </a>
+                    <a href= "roster" class="nav-item">
+                        <i data-lucide="trophy"></i> Roster
+                    </a>
+                    <a href="schedule" class="nav-item">
+                        <i data-lucide="calendar-clock"></i>Schedule
+                    </a>
+                    <a href="stats" class="nav-item">
+                        <i data-lucide="chart-bar-big"></i> Stats
+                    </a>
+                    <a href="games" class="nav-item">
+                        <i data-lucide="medal"></i> Games
+                    </a>
+                    <a href="users"class="nav-item">
+                        <i data-lucide="user"></i> Users
+                    </a>
+                </nav>
+                <main class="games-main">
+                    <h1 class="games-title"></h1>
+                    <script>
+                        // Add current year to title
+                        const titleEl = document.querySelector('.games-title');
+                        const currentYear = new Date().getFullYear();
+                        titleEl.textContent = `${currentYear} Season`;
+                    </script>
+                    <div id="games-table"></div>
+                    <button type="button" id="open-modal-btn">Add Game</button>
+                    <div id="game-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-btn">&times;</span>
+                            <h2 id="game-title">Add New Game</h2>
+                            <form id="game-form">
+                                <label>Opponent:</label>
+                                <select id="opponent-select" name="OpponentID" required>
+                                    <option value="">Select Opponent</option>
+                                </select>
+                                <label>Location:</label>
+                                <input type="text" name="Location" required>
+                                <label>Date:</label>
+                                <input type="date" name="GameDate" required>
+                                <label>Time:</label>
+                                <input type="time" name="GameTime" value="12:00">
+                                <label>TeamScore</label>
+                                <input type="number" name="TeamScore" min="0">
+                                <label>OpponentScore</label>
+                                <input type="number" name="OpponentScore" min="0">
+                                <label>GameType</label>
+                            <select name="GameType">
+                                    <option value="PreSeason.">PreSeason</option>
+                                    <option value="Regular Season">Regular Season</option>
+                                    <option value="Playoff">Playoff</option>
+                                    <option value="District">District</option>
+                                    <option value="State Championship">State Championship</option>
+                                </select>
+                            </form>
+                            <button type="submit" id="submit-btn">Add Game</button>
+                            <button type="reset" id="reset-btn">Clear Values</button>
+                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
-        <script src="/js/games.js"></script>
-        <script>
-            const teamID = 1;
-            loadGames(teamID);
-            loadTeams();
-        </script>
+        <script type="module" src="../assets/js/games.js"></script>
         <script>lucide.createIcons();</script>
     </body>
 </html>

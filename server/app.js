@@ -1,8 +1,21 @@
 import express from 'express'
-import { getRecord, getGames, getTeams, addGame } from './database.js'
+import cookieParser from 'cookie-parser';
+import { 
+    getRecord, getGames, getTeams, addGame, findUserCreds, findUser, addRefreshToken,
+    getRefreshToken, deleteRefreshToken
+} from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { error } from 'console';
+import { error, log } from 'console';
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import bcrypt from 'bcryptjs';
+import { ref } from 'process';
+dotenv.config();
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// Middleware and Set-up
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 const app = express();
 const PORT = 3000;
@@ -21,15 +34,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Event: GET
- * Action: Load the login page to the user ../public/login.html
- */
-app.get('/', async (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public' ,'login.html'));
-});
-
-
-/**
  * Middleware: Serve static files (HTML, CSS, JS, images) 
  * from the public folder so the client can load them.
  */
@@ -39,6 +43,252 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
  * as req.body
  */
 app.use(express.json());
+app.use(cookieParser())
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// Authentication and Authorization
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Event: GET
+ * Action: Redirect the user to the login page.
+ */
+app.get('/', (req, res) => {
+    res.redirect('/login');
+})
+
+/**
+ * Event: GET
+ * Action: Load the login page to the user ../public/login.html
+ */
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' ,'login.html'));
+});
+
+/**
+ * Action: POST
+ * Event: Receive users password and confirm authorization
+ */
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { loginID, password } = req.body;
+
+        if (!loginID || !password) {
+            return res.status(422).json({ message: "Please fill out all forms" })
+        }
+
+        // Return user row or null
+        const user = await findUserCreds(loginID);
+        if (!user) {
+            return res.status(401).json({ message: "UserName and/or Password is Invalid" });
+        }
+        const passMatch = await bcrypt.compare(password, user.Password);
+        if (!passMatch) {
+            return res.status(401).json({ message: "UserName and/or Password is Invalid" });
+        }
+
+        // JWT access token
+        const payload = {
+            userID: user.UserID,
+            teamID: user.TeamID,
+            userRole: user.UserRole
+        };
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { subject: 'accessDash', expiresIn: process.env.ACCESS_TKN_EXP } );
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH, { subject: 'refreshDash', expiresIn: process.env.REFRESH_TKN_EXP });
+
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days in ms
+        const refreshData = {
+            refreshToken,
+            userID: user.UserID,
+            expiresAt,
+            CreatedOn: new Date()
+        };
+        const db_success = await addRefreshToken(refreshData);
+        console.log(db_success);
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        return res.json({
+            userID: user.UserID,
+            teamID: user.TeamID,
+            userRole: user.UserRole,
+            accessToken: accessToken,
+        });
+
+        
+    } catch (error) {
+        console.error("Login error:", error);
+        return res.status(500).json({ error: "Something went wrong in login." });
+    }
+});
+
+/**
+ * Event: POST
+ * Action: Post refresh token for user 
+ */
+app.post('/api/auth/refresh-token', async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'Refresh Token not found' });
+        }
+
+        const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH);
+        const userRefreshToken = await getRefreshToken( {refreshToken, userID: decodedRefreshToken.userID} );
+
+        if (!userRefreshToken) {
+            return res.status(401).json({ message: 'Refresh Token Invalid or Expired' });
+        }
+
+        await deleteRefreshToken(refreshToken);
+
+        // Create a new refresh and access token
+        // JWT access token
+        const payload = {
+            userID: decodedRefreshToken.userID,
+            teamID: decodedRefreshToken.teamID,
+            userRole: decodedRefreshToken.userRole
+        };
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { subject: 'accessDash', expiresIn: process.env.ACCESS_TKN_EXP } );
+        const newRefreshToken = jwt.sign(payload, process.env.JWT_REFRESH, { subject: 'refreshDash', expiresIn: process.env.REFRESH_TKN_EXP });
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        const newRefreshData = {
+            refreshToken: newRefreshToken,
+            userID: decodedRefreshToken.userID,
+            expiresAt,
+            CreatedOn: new Date()
+        };
+        const db_success = await addRefreshToken(newRefreshData);
+        console.log(db_success);
+
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict", // Only use cookie when requests are from this site
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        return res.json({
+            accessToken: accessToken,
+        });
+
+
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Refresh Token Invalid or Expired' });
+        }
+        console.error("Login error:", error);
+        return res.status(500).json({ error: "Something went wrong in login." });
+    }
+})
+
+async function ensureAuthenticated(req, res, next) {
+    const accessToken = req.headers.authorization;
+
+    if (!accessToken) {
+        return res.status(401).json( {message: "Access Token not found."} );
+    }
+    try {
+        const decodedAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET);
+        req.user = { 
+            userID: decodedAccessToken.userID,
+            teamID: decodedAccessToken.teamID,
+            userRole: decodedAccessToken.userRole
+        };
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Access Token expired/not found"});
+    }
+}
+/**
+ * Event: GET
+ * Action:
+ *      Verify that the current user is authenticated when acessing pages
+ */
+app.get('/api/auth/me', ensureAuthenticated, async (req, res) => {
+    try {
+        const userID = req.user.userID;
+        const user = await findUser(userID);
+        if (!user) {
+            res.status(404).json( {message: "User not found."} );
+        }
+        
+        return res.status(200).json({
+            userID: user.userID,
+            teamID: user.teamID,
+            userRole: user.userRole,
+        })
+    } catch (err) {
+        return res.status(500).json({ error: err.message })
+    }
+});
+
+/**
+ * Event: GET
+ * 
+ */
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// Serve Pages
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Event: GET
+ * Action: Load the home page to the user ../public/pages/home.html
+ */
+app.get('/home', async (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'home.html'));
+});
+
+/**
+ * Event: GET
+ * Action: Load the roster page to the user ../public/pages/roster.html
+ */
+app.get('/roster', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'roster.html'));
+});
+
+/**
+ * Event: GET
+ * Action: Load the games page to the user ../public/pages/games.html
+ */
+app.get('/games', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'games.html'));
+});
+
+/**
+ * Event: GET
+ * Action: Load the stats page to the user ../public/pages/stats.html
+ */
+app.get('/stats', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'stats.html'));
+});
+
+/**
+ * Event: GET
+ * Action: Load the schedule page to the user ../public/pages/schedule.html
+ */
+app.get('/schedule', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'schedule.html'));
+});
+
+/**
+ * Event: GET
+ * Action: Load the users page to the user ../public/users/schedule.html
+ */
+app.get('/users', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'users.html'));
+});
+
+
+
 
 /**
  * Event: GET the teams current record

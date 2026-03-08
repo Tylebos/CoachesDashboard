@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.18.2",
     "tabulator-tables": "^6.3.1"
   },
@@ -9,10 +12,9 @@
   "version": "1.0.0",
   "description": "A simple coaches dashboard with UCaaS (Simulated or Real-World API)",
   "type": "module",
-  "main": "app.js",
+  "main": "server/app.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -24,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/Tylebos/CoachesDashboard/issues"
   },
-  "homepage": "https://github.com/Tylebos/CoachesDashboard#readme"
+  "homepage": "https://github.com/Tylebos/CoachesDashboard#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
