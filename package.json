@@ -14,7 +14,7 @@
   "type": "module",
   "main": "server/app.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon server/app.js"
   },
   "repository": {
     "type": "git",

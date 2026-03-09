@@ -160,8 +160,13 @@ async function loadTeamRecord(teamID) {
     try {
         const res = await fetch(`/api/teams/${teamID}/record`);
         if(!res.ok) throw new Error(`HTTP Error! status code: ${res.status}`);
-        const record = await res.json();
-        document.querySelector('.win-loss').textContent = `${record.Wins} - ${record.Losses}`;
+        const record = await res.json(); // expect { Wins: 3, Losses: 2 }
+
+        const winsEl = document.querySelector('.win-loss .wins');
+        const lossesEl = document.querySelector('.win-loss .losses');
+
+        winsEl.textContent = record.Wins;
+        lossesEl.textContent = record.Losses;
     } catch(err) {
         console.error("Failed to load team record: ", err);
     }

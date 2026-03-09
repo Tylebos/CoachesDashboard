@@ -9,6 +9,11 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise() // Allows for async functions
 
+////////////////////////////////////////////////////////////////////////////////////////
+// HOME QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
+
+
 /**
  * Function: getRecord
  * Purpose:
@@ -31,6 +36,9 @@ export async function getRecord(TeamID) {
     return rows;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+// GAMES QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Function: getTeams
@@ -111,6 +119,56 @@ export async function getGames(TeamID) {
     return rows
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+// ROSTER QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
+export async function getAdminRoster(teamID) {
+    const query = `
+        SELECT 
+            CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
+            p.PlayerClass,
+            p.PlayerPhone,
+            p.PlayerEmail,
+            p.PlayerAddress,
+            p.PlayerGPA,
+            CASE 
+                WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
+                ELSE 'ELIGIBLE'
+            END AS Eligibility
+        FROM CoachesDashboard.Players p
+        WHERE p.TeamID = ?;
+    `
+    const [rows] = await pool.query(query, [teamID]);
+    return rows
+}
+
+export async function getFullRoster(teamID) {
+    const query = `
+        SELECT 
+            CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
+            p.PlayerJerseyNumber,
+            ps.PositionName AS Position,
+            ps.SideOfBall,
+            p.PlayerClass,
+            CASE 
+                WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
+                ELSE 'ELIGIBLE'
+            END AS Eligibility
+        FROM Players p 
+        INNER JOIN PlayerPositions pp
+            on pp.PlayerID = p.PlayerID 
+        INNER JOIN Positions ps
+            on pp.PositionID = ps.PositionID 
+        WHERE p.TeamID = ?;
+    `;
+    const [rows] = await pool.query(query, [teamID]);
+    return rows;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+// USERS QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Function: findUserCreds
  * Purpose:
@@ -167,6 +225,7 @@ export async function addRefreshToken(refreshData) {
     return { success: true };
 }
 
+
 /**
  * Function: getRefreshToken
  * Purpose:
@@ -198,7 +257,7 @@ export async function getRefreshToken(refreshData) {
 export async function deleteRefreshToken(refreshToken) {
     const query = `
         DELETE FROM RefreshTokens
-        WHERE Token = ?c
+        WHERE Token = ?
     `;
     await pool.query(query, [refreshToken]);
 

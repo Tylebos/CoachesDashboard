@@ -2,7 +2,7 @@ import express from 'express'
 import cookieParser from 'cookie-parser';
 import { 
     getRecord, getGames, getTeams, addGame, findUserCreds, findUser, addRefreshToken,
-    getRefreshToken, deleteRefreshToken
+    getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster
 } from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -289,6 +289,9 @@ app.get('/users', (req, res) => {
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////
+// HOME QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Event: GET the teams current record
@@ -306,6 +309,9 @@ app.get('/api/teams/:id/record', async (req, res) => {
     }
 })
 
+////////////////////////////////////////////////////////////////////////////////////////
+// GAME QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Event: GET teams games
  * Action: Serve the team from team ids 
@@ -352,6 +358,40 @@ app.post('/api/team/:id/addgame', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json( {error: "Something went wrong adding a game"} );
+    }
+})
+
+////////////////////////////////////////////////////////////////////////////////////////
+// ROSTER QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Event: GET
+ * Action: Serve the players roster with admin player data
+ */
+app.get('/api/players/:id/admin', async (req, res) =>{
+    const TeamID = Number(req.params.id);
+    try {
+        const players = await getAdminRoster(TeamID);
+        res.json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json( {error: "Something went wrong getting the players" } );
+    }
+})
+
+/**
+ * Event: GET
+ * Action: Serve the players full team roster
+ */
+app.get('/api/players/:id/roster', async (req, res) =>{
+    const TeamID = Number(req.params.id);
+    try {
+        const players = await getFullRoster(TeamID);
+        res.json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json( {error: "Something went wrong getting the players" } );
     }
 })
 

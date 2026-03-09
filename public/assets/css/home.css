@@ -44,3 +44,87 @@
     grid-row: span 2; /* spans two rows vertically */
     min-height: 400px; /* ensures it has visual weight */
 }
+
+.ch-btn {
+    margin-top: 25px;
+    background-color: #4169E1;        /* Dodger Blue */
+    color: white;                     /* Text color */
+    border: none;                     /* Remove default border */
+    padding: 12px 24px;               /* Comfortable padding */
+    font-size: 16px;                  /* Readable text */
+    font-weight: 600;                 /* Slightly bold */
+    border-radius: 8px;               /* Rounded corners */
+    cursor: pointer;                  /* Pointer on hover */
+    transition: all 0.2s ease-in-out; /* Smooth hover transition */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.ch-btn:hover {
+    background-color: #1C86EE;        /* Slightly darker on hover */
+    transform: translateY(-2px);      /* Subtle lift effect */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.ch-btn:active {
+    background-color: #1874CD;        /* Even darker when pressed */
+    transform: translateY(0);         /* Pressed effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.st-btn {
+    margin-top: 25px;
+    background-color: #4169E1;        /* Dodger Blue */
+    color: white;                     /* Text color */
+    border: none;                     /* Remove default border */
+    padding: 12px 24px;               /* Comfortable padding */
+    font-size: 16px;                  /* Readable text */
+    font-weight: 600;                 /* Slightly bold */
+    border-radius: 8px;               /* Rounded corners */
+    cursor: pointer;                  /* Pointer on hover */
+    transition: all 0.2s ease-in-out; /* Smooth hover transition */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.st-btn:hover {
+    background-color: #1C86EE;        /* Slightly darker on hover */
+    transform: translateY(-2px);      /* Subtle lift effect */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.st-btn:active {
+    background-color: #1874CD;        /* Even darker when pressed */
+    transform: translateY(0);         /* Pressed effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.win-loss {
+    display: inline-flex;
+    gap: 10px;
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+}
+
+.win-loss .wins,
+.win-loss .losses {
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: black;
+    -webkit-text-stroke: 1.5px whitesmoke;
+    min-width: 50px;
+    text-align: center;
+}
+
+.win-loss .wins {
+    background-color: royalblue; /* Green for wins */
+}
+
+.win-loss .losses {
+    background-color: gray; /* Red for losses */
+}
+
+.next-opp, .tm-rec, .standings-title {
+    gap: 10px;
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+}

@@ -46,32 +46,36 @@
                     <!-- Metrics Data Below -->
                     <div class="metrics-grid">
                         <div class="metric-card">
-                            <h2>Win/Loss Record</h2>
-                            <p class="win-loss"></p>
+                            <h2 class="tm-rec">Team Record</h2>
+                            <p class="win-loss">
+                                <span class="wins">0</span>
+                                -
+                                <span class="losses">0</span>
+                            </p>
                         </div>
                         <div class="metric-card">
-                            <h2>Next Opponent</h2>
+                            <h2 class="next-opp">Next Opponent</h2>
                             <p class="next-opp">Rivertown Hawks</p>
                         </div>
                         <div class="metric-card chart-card">
                             <div class="chart-header">
                                 <canvas id="stat-chart"></canvas>
                                 <div class="chart-buttons">
-                                    <button onclick="changeChart('ppg')">PPG</button>
-                                    <button onclick="changeChart('tov')">TOV</button>
-                                    <button onclick="changeChart('rdz')">RDZ</button>
+                                    <button class="ch-btn" onclick="changeChart('ppg')">PPG</button>
+                                    <button class="ch-btn" onclick="changeChart('tov')">TOV</button>
+                                    <button class="ch-btn" onclick="changeChart('rdz')">RDZ</button>
                                 </div>
                             </div>
                         </div>
                         <div class="metric-card chart-card">
                             <div class="standings-header">
                                 <h2 class="standings-title">Division Standings</h2>
+                                <div id="standings-table"></div>
                                 <div class="stand-buttons">
-                                    <button onclick="changeStand('div')">DIV</button>
-                                    <button onclick="changeStand('lge')">LGE</button>
+                                    <button class="st-btn" onclick="changeStand('div')">DIV</button>
+                                    <button class="st-btn" onclick="changeStand('lge')">LGE</button>
                                 </div>
                             </div>
-                            <div id="standings-table"></div>
                         </div>
                     </div>
                 </main>

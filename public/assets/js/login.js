@@ -55,11 +55,11 @@ async function login() {
       form.style.display = "none";
       welcome.style.display = "block";
       welcome.style.animation = "fadeInUp 0.8s forwards";
-    }, 3000);
+    }, 1000);
 
     setTimeout(() => {
       window.location.href = '/home'
-    }, 2000);
+    }, 3000);
 
   } catch (error) {
     console.error("Login failed:", error);
