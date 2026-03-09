@@ -1,0 +1,8 @@
+HOST='127.0.0.1'
+MYSQL_USER='your_db_username'
+MYSQL_PASSWORD='your_db_password'
+MYSQL_DATABASE='your_db'
+JWT_SECRET='your_jsonwentoken_secret'
+ACCESS_TKN_EXP='your_exp_time'
+JWT_REFRESH='your_refresh_secret'
+REFRESH_TKN_EXP='your_exp_time'
