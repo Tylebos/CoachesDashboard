@@ -87,6 +87,10 @@
   cursor: pointer;
 }
 
+.close-btn:hover {
+  color: red;
+}
+
 /* Form inputs */
 .modal-content input {
   padding: 8px 12px;

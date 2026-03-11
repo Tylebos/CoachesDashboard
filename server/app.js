@@ -2,7 +2,8 @@ import express from 'express'
 import cookieParser from 'cookie-parser';
 import { 
     getRecord, getGames, getTeams, addGame, findUserCreds, findUser, addRefreshToken,
-    getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster
+    getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster, getOffensiveRoster,
+    getDefensiveRoster
 } from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -388,6 +389,36 @@ app.get('/api/players/:id/roster', async (req, res) =>{
     const TeamID = Number(req.params.id);
     try {
         const players = await getFullRoster(TeamID);
+        res.json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json( {error: "Something went wrong getting the players" } );
+    }
+})
+
+/**
+ * Event: GET
+ * Action: Serve the players Offensive team roster
+ */
+app.get('/api/players/:id/off-roster', async (req, res) =>{
+    const TeamID = Number(req.params.id);
+    try {
+        const players = await getOffensiveRoster(TeamID);
+        res.json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json( {error: "Something went wrong getting the players" } );
+    }
+})
+
+/**
+ * Event: GET
+ * Action: Serve the players Offensive team roster
+ */
+app.get('/api/players/:id/def-roster', async (req, res) =>{
+    const TeamID = Number(req.params.id);
+    try {
+        const players = await getDefensiveRoster(TeamID);
         res.json(players);
     } catch (error) {
         console.error(error);

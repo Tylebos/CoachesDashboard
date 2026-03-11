@@ -165,6 +165,51 @@ export async function getFullRoster(teamID) {
     return rows;
 }
 
+export async function getOffensiveRoster(teamID) {
+    const query = `
+        SELECT 
+            CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
+            p.PlayerJerseyNumber,
+            ps.PositionName AS Position,
+            p.PlayerClass,
+            CASE 
+                WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
+                ELSE 'ELIGIBLE'
+            END AS Eligibility
+        FROM Players p 
+        INNER JOIN PlayerPositions pp
+            on pp.PlayerID = p.PlayerID 
+        INNER JOIN Positions ps
+            on pp.PositionID = ps.PositionID 
+        WHERE ps.SideOfBall = 'Offense' AND p.TeamID = ?;
+    `;
+    const [rows] = await pool.query(query, [teamID]);
+    return rows;
+}
+
+export async function getDefensiveRoster(teamID) {
+    const query = `
+        SELECT 
+            CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
+            p.PlayerJerseyNumber,
+            ps.PositionName AS Position,
+            ps.SideOfBall,
+            p.PlayerClass,
+            CASE 
+                WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
+                ELSE 'ELIGIBLE'
+            END AS Eligibility
+        FROM Players p 
+        INNER JOIN PlayerPositions pp
+            on pp.PlayerID = p.PlayerID 
+        INNER JOIN Positions ps
+            on pp.PositionID = ps.PositionID 
+        WHERE ps.SideOfBall = 'Defense' AND p.TeamID = ?;
+    `;
+    const [rows] = await pool.query(query, [teamID]);
+    return rows;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // USERS QUERIES
 ////////////////////////////////////////////////////////////////////////////////////////
