@@ -60,6 +60,26 @@ export async function getTeams() {
 }
 
 /**
+ * Function: getGameIDs
+ * Purpose:
+ *      SQL query to get game information
+ * @param: None
+ * @return: array of game data
+ */
+export async function getGameIDs() {
+    const query = `
+        SELECT GameID, CONCAT(t.TeamCity, " ", t.TeamName, ' ', "vs", ' ', t2.TeamCity, " ", t2.TeamName ) AS Game
+        FROM Games g
+        INNER JOIN Teams t
+            ON g.TeamID = t.TeamID
+       	INNER JOIN Teams t2
+       		ON g.OpponentID = t2.TeamID;
+    `;
+    const [rows] = await pool.query(query);
+    return rows;
+}
+
+/**
  * Function: addGame
  * Purpose:
  *      SQL query to add a game to the games table
@@ -88,6 +108,64 @@ export async function addGame(gameData, teamID) {
 }
 
 /**
+ * Function: deleteGame
+ * Purpose:
+ *      SQL query to delete a game from the games table
+ * @param: valid gameID
+ * @return: success/fail json
+ */
+export async function deleteGame(gameID) {
+    const query = `
+        DELETE FROM Games
+        WHERE GameID = ?;
+    `;
+    const [result] = await pool.query(query, [gameID]);
+
+    if (result.affectedRows === 0) {
+        return { success: false, message: 'Game not found' };
+    }
+
+    return { success: true };
+}
+
+/**
+ * Function: editGame
+ * Purpose:
+ *      SQL query to edit a user selected game in the games table
+ * @param: valid gameID and data
+ * @return: success/fail json
+ */
+export async function editGame(gameID, data) {
+    const query = `
+        UPDATE Games
+        SET 
+            OpponentID = ?,
+            Location = ?,
+            GameDate = ?,
+            GameTime = ?,
+            OpponentScore = ?,
+            TeamScore = ?,
+            GameType = ?
+        WHERE GameID = ?
+    `
+    const [result] = await pool.query(query, [
+        data.opponentID,
+        data.location,
+        data.gameDate,
+        data.gameTime,
+        data.opponentScore,
+        data.teamScore,
+        data.gameType,
+        gameID
+    ]);
+    if (result.affectedRows === 0) {
+        return { success: false, message: "Game not found" };
+    }
+
+    return { success: true };
+}
+
+/**
  * Function: getGames
  * Purpose:
  *      SQL query to return a table of game information to the 
@@ -97,7 +175,7 @@ export async function addGame(gameData, teamID) {
  */
 export async function getGames(TeamID) {
     const query = `
-        SELECT CONCAT(t2.TeamCity, " ", t2.TeamName) AS OpponentName, g.Location, g.GameDate, g.GameTime, g.GameType,
+        SELECT GameID, OpponentID, CONCAT(t2.TeamCity, " ", t2.TeamName) AS OpponentName, g.Location, g.GameDate, g.GameTime, g.GameType, TeamScore, OpponentScore,
             COALESCE(
             CASE 
                 WHEN g.TeamScore IS NULL OR g.OpponentScore IS NULL THEN NULL
@@ -113,7 +191,7 @@ export async function getGames(TeamID) {
         INNER JOIN CoachesDashboard.Teams t2
             ON t2.TeamID = g.OpponentID 
         WHERE g.TeamID = ?
-        ORDER BY g.GameDate 
+        ORDER BY g.GameID 
     `
     const [rows] = await pool.query(query, [TeamID])
     return rows
@@ -208,6 +286,95 @@ export async function getDefensiveRoster(teamID) {
     `;
     const [rows] = await pool.query(query, [teamID]);
     return rows;
+}
+
+/**
+ * Function: LoadPlayerID
+ * Purpose:
+ *      SQL Query to fetch playerIDs for deletion
+ * @param: teamID
+ * @return: array of player ids
+ */
+export async function loadPlayerID(teamID) {
+    const query = `
+        SELECT PlayerID, CONCAT(PlayerFirstName, ' ', PlayerLastName) as Name
+        FROM Players
+        WHERE teamID = ?;
+    `;
+
+    const [ids] = await pool.query(query, [teamID]);
+
+    return ids;
+}
+
+/**
+ * Function: Add Player
+ * Purpose:
+ *      SQL Query to add a player to the player table
+ * @param: valid teamID and playerData
+ * @return: json success/fail message
+ */
+export async function addPlayer(teamID, playerData) {
+    const connection = await pool.getConnection(); // We need a dedicated connection for the transaction
+    try {
+        await connection.beginTransaction();
+        const [playerResult] = await connection.execute(`
+            INSERT INTO Players (
+            PlayerFirstName, PlayerLastName, PlayerAddress, PlayerGPA, PlayerPhone, 
+            PlayerEmail, TeamID, PlayerJerseyNumber, PlayerClass
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            `,[
+                playerData.PlayerFirstName,
+                playerData.PlayerLastName,
+                playerData.PlayerAddress,
+                playerData.PlayerGPA,
+                playerData.PlayerPhone,
+                playerData.PlayerEmail,
+                teamID,
+                playerData.PlayerJerseyNumber,
+                playerData.PlayerClass,
+            ]);
+            const playerID = playerResult.insertId;
+
+            const [positionResult] = await connection.execute(`
+                INSERT INTO PlayerPositions (PlayerID, PositionID)
+                SELECT ?, pos.PositionID
+                FROM Positions pos
+                WHERE PositionName = ?
+                `, 
+                [playerID, playerData.PositionName]
+            );
+            if (positionResult.affectedRows === 0) {
+                throw new Error("Position not found");
+            }
+            await connection.commit();
+            return { success: true, playerID};
+    } catch(error) {
+        await connection.rollback();
+        return { success: false, message: error.message };
+    } finally {
+        connection.release(); // Let go of the connection
+    }
+}
+
+/**
+ * Function: Delete Player
+ * Purpose:
+ *      SQL Query to delete a player from 
+ */
+export async function deletePlayer(playerID) {
+    const query = `
+        DELETE FROM Players
+        WHERE PlayerID = ?
+    `
+    const [result] = await pool.query(query, [playerID]);
+
+    if (result.affectedRows === 0) {
+        return { success: false, message: 'Game not found' };
+    }
+
+    return { success: true };
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

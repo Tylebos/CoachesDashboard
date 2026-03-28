@@ -1,9 +1,9 @@
 import express from 'express'
 import cookieParser from 'cookie-parser';
 import { 
-    getRecord, getGames, getTeams, addGame, findUserCreds, findUser, addRefreshToken,
+    getRecord, getGames, getGameIDs, getTeams, addGame, deleteGame, editGame, findUserCreds, findUser, addRefreshToken,
     getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster, getOffensiveRoster,
-    getDefensiveRoster
+    getDefensiveRoster, loadPlayerID ,addPlayer, deletePlayer
 } from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,7 +19,7 @@ dotenv.config();
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 // Needed to get __dirname in ES modules
 /**
@@ -329,6 +329,16 @@ app.get('/api/teams/:id/games', async (req, res) => {
     }
 })
 
+app.get('/api/gameIDs', async (req, res) => {
+    try {
+        const games = await getGameIDs();
+        res.json(games);
+    } catch (err) {
+        console.error(err)
+        res.status(500).json( { error: "Something went wrong."} )
+    }
+})
+
 /**
  * Event: GET teams
  * Action: Serve the add teams form with a list of
@@ -361,6 +371,49 @@ app.post('/api/team/:id/addgame', async (req, res) => {
         res.status(500).json( {error: "Something went wrong adding a game"} );
     }
 })
+
+/**
+ * Event: DELETE game
+ * Action: Delete a game from the Games Table
+ */
+
+app.delete('/api/game/:id/deleteGame', async (req, res) => {
+    const gameID = Number(req.params.id);
+    try {
+        const result = await deleteGame(gameID);
+        if (!result.success) {
+            return res.status(404).json(result);
+        }
+        res.status(200).json(result);
+    } catch(err) {
+        console.error(err);
+        res.status(500).json( {error: "Something went wrong deleting a game"} );
+    }
+})
+/**
+ * Event: PUT
+ * Action: Update a selected game in the games table
+ */
+
+app.put('/api/game/:id/editGame', async (req, res) => {
+    const gameID = Number(req.params.id);
+    const data = req.body;
+
+    try {
+        const result = await editGame(gameID, data);
+
+        // MySQL returns affectedRows
+        if (!result || result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: "Game not found or not updated" });
+        }
+
+        res.status(200).json({ success: true });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Something went wrong updating the game" });
+    }
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // ROSTER QUERIES
@@ -423,6 +476,60 @@ app.get('/api/players/:id/def-roster', async (req, res) =>{
     } catch (error) {
         console.error(error);
         res.status(500).json( {error: "Something went wrong getting the players" } );
+    }
+})
+
+/**
+ * Event: GET
+ * Action: Fetch playerIDs and their names
+ */
+app.get(`/api/players/:id/playerID`, async (req, res) => {
+    const teamID = Number(req.params.id);
+    try {
+        const ids = await loadPlayerID(teamID);
+        res.json(ids);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json( {error: "Something went wrong getting the playerIds" } );
+    }
+})
+
+/**
+ * Event: POST
+ * Action: Post player to the postion table update PlayerPosition Join table
+ */
+app.post('/api/players/:id/addPlayer', async (req, res) => {
+    const teamID = Number(req.params.id);
+    const playerData = req.body;
+
+    try {
+        const result = await addPlayer(teamID, playerData);
+        if (!result.success) {
+            return res.status(400).json({ error: result.message });
+        }
+        res.status(201).json({ message: 'Player added', playerID: result.playerID });
+    } catch(error) {
+        console.error(error);
+        res.status(500).json({ error: 'Something went wrong adding the player' });
+    }
+})
+
+/**
+ * Event: DELETE
+ * Action: Delete Player from the Players table
+ */
+app.delete('/api/players/:id/deletePlayer', async (req, res) => {
+    const playerID = Number(req.params.id);
+
+    try {
+        const result = await deletePlayer(playerID);
+        if(!result.success) {
+            return res.status(400).json({ error: result.message });
+        }
+        res.status(200).json({ message: 'Player Deleted' });
+    } catch (error) {
+       console.error(error);
+        res.status(500).json({ error: 'Something went wrong deleting the player' });
     }
 })
 

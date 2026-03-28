@@ -54,31 +54,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#open-modal-btn {
-    background-color: #4169E1;        /* Dodger Blue */
-    color: white;                     /* Text color */
-    border: none;                     /* Remove default border */
-    padding: 12px 24px;               /* Comfortable padding */
-    font-size: 16px;                  /* Readable text */
-    font-weight: 600;                 /* Slightly bold */
-    border-radius: 8px;               /* Rounded corners */
-    cursor: pointer;                  /* Pointer on hover */
-    transition: all 0.2s ease-in-out; /* Smooth hover transition */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-#open-modal-btn:hover {
-    background-color: #1C86EE;        /* Slightly darker on hover */
-    transform: translateY(-2px);      /* Subtle lift effect */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-#open-modal-btn:active {
-    background-color: #1874CD;        /* Even darker when pressed */
-    transform: translateY(0);         /* Pressed effect */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 /* Modal background */
 .modal {
   position: fixed;
@@ -165,7 +140,98 @@
   background: dodgerblue;
 }
 
-.radio-group label {
+
+.table-wrapper {
+    position: relative;
+}
+
+/* Menu container */
+.menu-container {
+    position: absolute;
+    top: -40px;
+    right: -5px;
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown menu */
+.menu-dropdown {
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+    min-width: 160px;
+    z-index: 100;
+}
+
+/* Dropdown buttons */
+.menu-dropdown button {
+    padding: 10px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-dropdown button:hover {
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+}
+
+/* Modal white content */
+.delete-modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  position: relative;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+#delete-modal select {
+    margin-top: 10px;
+    display: list-item;
+    padding: 8px 30px;       /* bigger padding for more space */
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    appearance: none;          /* remove default arrow */
+    background-color: #fff;
+    cursor: pointer;
+}
+
+#delete-modal select:focus {
+    outline: none;
+    border-color: royalblue;
+    box-shadow: 0 0 5px rgba(65, 105, 225, 0.5);
+}
+
+/* Submit button */
+.delete-modal-content button {
+  background: royalblue;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.delete-modal-content button:hover {
+  background: dodgerblue;
 }

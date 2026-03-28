@@ -50,8 +50,23 @@
                         const currentYear = new Date().getFullYear();
                         titleEl.textContent = `${currentYear} Season`;
                     </script>
-                    <div id="games-table"></div>
-                    <button type="button" id="open-modal-btn">Add Game</button>
+                    <div class="table-wrapper">
+
+                        <div class="menu-container">
+                            <button class="menu-button" id="menu-btn">
+                                <i data-lucide="ellipsis"></i>
+                            </button>
+
+                            <div class="menu-dropdown" id="menu-dropdown">
+                                <button id="open-modal-btn">Add Game</button>
+                                <button id="delete-game">Delete Game</button>
+                                <button id="export-game">Export CSV</button>
+                            </div>
+                        </div>
+
+                        <div id="game-table"></div>
+
+                    </div>
                     <div id="game-modal" class="modal">
                         <div class="modal-content">
                             <span class="close-btn">&times;</span>
@@ -83,6 +98,20 @@
                             <button type="submit" id="submit-btn">Add Game</button>
                             <button type="reset" id="reset-btn">Clear Values</button>
                         </div>
+                    </div>
+                    <div id="delete-modal" class="modal">
+                        <div class="delete-modal-content">
+                            <span class="del-close-btn">&times;</span>
+                            <h2 id="delete-title">Delete Game</h2>
+                            <form id="delete-form">
+                                <select id="game-select" name="GameID" required>
+                                    <option value="">Select Game</option>
+                                </select>
+                            </form>
+                            <button type="button" id="delete-sub">Delete Game</button>
+                        </div>
+                    </div>
+                    <div id="edit-modal" class="modal">
                     </div>
                 </main>
             </div>

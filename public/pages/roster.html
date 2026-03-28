@@ -70,30 +70,53 @@
                                 <input type="number" name="PlayerJerseyNumber" min="0" max="99" required>
                                 <label>Position:</label>
                                 <input type="text" name="Position" required>
-                                <div class="radio-group">
-                                <label>
-                                    Offense:
-                                    <input type="radio" name="SideOfBall" value="offense" required>
-                                </label>
-
-                                <label>
-                                    Defense:
-                                    <input type="radio" name="SideOfBall" value="defense">
-                                </label>
-                                </div>
                             </form>
-                            <button type="submit" id="submit-btn">Add Game</button>
+                            <button type="submit" id="submit-btn">Add Player</button>
                             <button type="reset" id="reset-btn">Clear Values</button>
                         </div>
                     </div>
+                    <div id="delete-modal" class="modal">
+                        <div class="delete-modal-content">
+                            <span class="del-close-btn">&times;</span>
+                            <h2 id="delete-title">Delete Game</h2>
+                            <form id="delete-form">
+                                <select id="player-select" name="playerID" required>
+                                    <option value="">Select Game</option>
+                                </select>
+                            </form>
+                            <button type="button" id="delete-sub">Delete Game</button>
+                        </div>
+                    </div>
                     <h1 class="roster-title">Team Roster</h1>
-                    <div id="roster-table"></div>
+                    <div class="table-wrapper">
+
+                        <div class="menu-container">
+                            <button class="menu-button" id="menu-btn">
+                                <i data-lucide="ellipsis"></i>
+                            </button>
+
+                            <div class="menu-dropdown" id="menu-dropdown">
+                                <button id="open-modal-btn">Add Player</button>
+                                <button id="edit-player">Edit Player</button>
+                                <button id="delete-player">Delete Player</button>
+                                <button id="export-roster">Export CSV</button>
+                            </div>
+                        </div>
+
+                        <div id="roster-table"></div>
+
+                    </div>
+                    <div class="menu-dropdown" id="menu-dropdown">
+                        <button id="open-modal-btn">Add Player</button>
+                        <button id="edit-player">Edit Player</button>
+                        <button id="delete-player">Delete Player</button>
+                        <button id="export-roster">Export CSV</button>
+                    </div>
                     <div class="roster-buttons">
                         <button class="roster-button" id="ad">Admin Roster</button>
                         <button class="roster-button" id="full">Full Roster</button>
                         <button class="roster-button" id="off">Offense</button>
                         <button class="roster-button" id="def">Defense</button>
-                        <button class="roster-button" id="open-modal-btn">Add Player</button>
                     </div>
                 </main>
             </div>
