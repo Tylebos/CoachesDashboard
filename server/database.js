@@ -30,7 +30,7 @@ export async function getRecord(TeamID) {
             SUM(CASE WHEN TeamScore < OpponentScore THEN 1 ELSE 0 END) AS Losses,
             SUM(CASE WHEN TeamScore = OpponentScore THEN 1 ELSE 0 END) AS Ties
         FROM Games
-        WHERE TeamID = ?
+        WHERE TeamID = ? AND GameType = "Regular Season"
     `
     const [rows] = await pool.query(query, [TeamID]) // Pause here for query to finish
     return rows;
@@ -191,7 +191,7 @@ export async function getGames(TeamID) {
         INNER JOIN CoachesDashboard.Teams t2
             ON t2.TeamID = g.OpponentID 
         WHERE g.TeamID = ?
-        ORDER BY g.GameID 
+        ORDER BY g.GameDate 
     `
     const [rows] = await pool.query(query, [TeamID])
     return rows

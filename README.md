@@ -28,9 +28,10 @@ for my demo is the **Deltona Wolves**. The dashboard allows a coach to view pert
 schedule, record, statistics, and account users. The application is broken into 5 pages:
 
 - **Home**: A consolidated view of the teams record, upcoming game, and charts containing team data.
-- **Games**: A table view of the teams current season schedule including completed and upcoming games.
 - **Roster**: A table view of the teams roster. Configurable to display different data points based on the coaches needs.
 - **Schedule**: A Calendar display of the coaches schedule to include practices, meetings, and other events.
+- **Stats** Table view of player stats.
+- **Games**: A table view of the teams current season schedule including completed and upcoming games.
 - **Users**: A portal for managing account users (Coaches and Admins only)
 
 ## Features
