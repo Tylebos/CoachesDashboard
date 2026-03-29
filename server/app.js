@@ -297,7 +297,7 @@ app.get('/users', (req, res) => {
  * Action: Serve the the team from teamID's current 
  * record from the database
  */
-app.get('/api/teams/:id/record', async (req, res) => {
+app.get('/api/teams/:id/record', ensureAuthenticated, async (req, res) => {
     const TeamID = Number(req.params.id) // Pull variable from api right of the :
     try {
         const record = await getRecord(TeamID) // Wait for response
@@ -316,7 +316,7 @@ app.get('/api/teams/:id/record', async (req, res) => {
  * Action: Serve the team from team ids 
  * past and future games
  */
-app.get('/api/teams/:id/games', async (req, res) => {
+app.get('/api/teams/:id/games', ensureAuthenticated, async (req, res) => {
     const TeamID = Number(req.params.id)
     try {
         const games = await getGames(TeamID)
@@ -327,7 +327,7 @@ app.get('/api/teams/:id/games', async (req, res) => {
     }
 })
 
-app.get('/api/gameIDs', async (req, res) => {
+app.get('/api/gameIDs', ensureAuthenticated, async (req, res) => {
     try {
         const games = await getGameIDs();
         res.json(games);
@@ -342,7 +342,7 @@ app.get('/api/gameIDs', async (req, res) => {
  * Action: Serve the add teams form with a list of
  * the current teams with their team id in the database
  */
-app.get('/api/teams', async (req, res) => {
+app.get('/api/teams', ensureAuthenticated, async (req, res) => {
     // const TeamID = Number(req.params.id); we will use this later to not get ourselves
 
     try {
@@ -359,7 +359,7 @@ app.get('/api/teams', async (req, res) => {
  * Action: Send a new game to the Coaches Dashboard 
  * serve it to the table on games.html
  */
-app.post('/api/team/:id/addgame', async (req, res) => {
+app.post('/api/team/:id/addgame', ensureAuthenticated, async (req, res) => {
     const TeamID = Number(req.params.id);
     try {
         const gameID = await addGame(req.body, TeamID);
@@ -375,7 +375,7 @@ app.post('/api/team/:id/addgame', async (req, res) => {
  * Action: Delete a game from the Games Table
  */
 
-app.delete('/api/game/:id/deleteGame', async (req, res) => {
+app.delete('/api/game/:id/deleteGame', ensureAuthenticated, async (req, res) => {
     const gameID = Number(req.params.id);
     try {
         const result = await deleteGame(gameID);
@@ -393,7 +393,7 @@ app.delete('/api/game/:id/deleteGame', async (req, res) => {
  * Action: Update a selected game in the games table
  */
 
-app.put('/api/game/:id/editGame', async (req, res) => {
+app.put('/api/game/:id/editGame', ensureAuthenticated, async (req, res) => {
     const gameID = Number(req.params.id);
     const data = req.body;
 
@@ -421,7 +421,7 @@ app.put('/api/game/:id/editGame', async (req, res) => {
  * Event: GET
  * Action: Serve the players roster with admin player data
  */
-app.get('/api/players/:id/admin', async (req, res) =>{
+app.get('/api/players/:id/admin', ensureAuthenticated, async (req, res) =>{
     const TeamID = Number(req.params.id);
     try {
         const players = await getAdminRoster(TeamID);
@@ -436,7 +436,7 @@ app.get('/api/players/:id/admin', async (req, res) =>{
  * Event: GET
  * Action: Serve the players full team roster
  */
-app.get('/api/players/:id/roster', async (req, res) =>{
+app.get('/api/players/:id/roster', ensureAuthenticated, async (req, res) =>{
     const TeamID = Number(req.params.id);
     try {
         const players = await getFullRoster(TeamID);
@@ -451,7 +451,7 @@ app.get('/api/players/:id/roster', async (req, res) =>{
  * Event: GET
  * Action: Serve the players Offensive team roster
  */
-app.get('/api/players/:id/off-roster', async (req, res) =>{
+app.get('/api/players/:id/off-roster', ensureAuthenticated, async (req, res) =>{
     const TeamID = Number(req.params.id);
     try {
         const players = await getOffensiveRoster(TeamID);
@@ -466,7 +466,7 @@ app.get('/api/players/:id/off-roster', async (req, res) =>{
  * Event: GET
  * Action: Serve the players Offensive team roster
  */
-app.get('/api/players/:id/def-roster', async (req, res) =>{
+app.get('/api/players/:id/def-roster', ensureAuthenticated, async (req, res) =>{
     const TeamID = Number(req.params.id);
     try {
         const players = await getDefensiveRoster(TeamID);
@@ -481,7 +481,7 @@ app.get('/api/players/:id/def-roster', async (req, res) =>{
  * Event: GET
  * Action: Fetch playerIDs and their names
  */
-app.get(`/api/players/:id/playerID`, async (req, res) => {
+app.get(`/api/players/:id/playerID`, ensureAuthenticated, async (req, res) => {
     const teamID = Number(req.params.id);
     try {
         const ids = await loadPlayerID(teamID);
@@ -496,7 +496,7 @@ app.get(`/api/players/:id/playerID`, async (req, res) => {
  * Event: GET
  * Action: Fetch positions
  */
-app.get(`/api/positions`, async (req, res) => {
+app.get(`/api/positions`, ensureAuthenticated, async (req, res) => {
     try {
         const posIDs = await loadPosIDs();
         res.json(posIDs);
@@ -510,7 +510,7 @@ app.get(`/api/positions`, async (req, res) => {
  * Event: POST
  * Action: Post player to the postion table update PlayerPosition Join table
  */
-app.post('/api/players/:id/addPlayer', async (req, res) => {
+app.post('/api/players/:id/addPlayer', ensureAuthenticated, async (req, res) => {
     const teamID = Number(req.params.id);
     const playerData = req.body;
 
@@ -530,7 +530,7 @@ app.post('/api/players/:id/addPlayer', async (req, res) => {
  * Event: DELETE
  * Action: Delete Player from the Players table
  */
-app.delete('/api/players/:id/deletePlayer', async (req, res) => {
+app.delete('/api/players/:id/deletePlayer', ensureAuthenticated, async (req, res) => {
     const playerID = Number(req.params.id);
 
     try {
@@ -549,7 +549,7 @@ app.delete('/api/players/:id/deletePlayer', async (req, res) => {
  * Event: PUT
  * Action: Edit Player in the Players table
  */
-app.put('/api/players/:id/editPlayer', async (req, res) => {
+app.put('/api/players/:id/editPlayer', ensureAuthenticated, async (req, res) => {
     const playerID = Number(req.params.id);
     const playerData = req.body;
 

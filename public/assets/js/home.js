@@ -155,10 +155,14 @@ window.changeStand = changeStand;
 ////////////////////////////////////////////////////////////////////////////////////////////
 // TEAM RECORD
 ////////////////////////////////////////////////////////////////////////////////////////////
-async function loadTeamRecord(teamID) {
+async function loadTeamRecord() {
+    const accessToken = localStorage.getItem("accessToken")
+    const teamID = localStorage.getItem("teamID");
     if(!teamID) return; // prevent NaN error
     try {
-        const res = await fetch(`/api/teams/${teamID}/record`);
+        const res = await fetch(`/api/teams/${teamID}/record`, {
+            headers: { Authorization: accessToken }
+        });
         if(!res.ok) throw new Error(`HTTP Error! status code: ${res.status}`);
         const record = await res.json(); // expect { Wins: 3, Losses: 2 }
 
@@ -191,7 +195,7 @@ async function initPage() {
 
     initCharts();
     initStandings();
-    await loadTeamRecord(teamID);
+    await loadTeamRecord();
 }
 
 // run only after DOM is ready
