@@ -67,9 +67,11 @@
                                 <label>GPA:</label>
                                 <input type="number" name="PlayerGPA" required>
                                 <label>Jersey Number:</label>
-                                <input type="number" name="PlayerJerseyNumber" min="0" max="99" required>
+                                <input type="number" name="PlayerJerseyNumber" required>
                                 <label>Position:</label>
-                                <input type="text" name="Position" required>
+                                <select id="position" name="Position">
+                                    <option value="Select Position" disabled selected>Select Position</option>
+                                </select>
                             </form>
                             <button type="submit" id="submit-btn">Add Player</button>
                             <button type="reset" id="reset-btn">Clear Values</button>
@@ -97,7 +99,6 @@
 
                             <div class="menu-dropdown" id="menu-dropdown">
                                 <button id="open-modal-btn">Add Player</button>
-                                <button id="edit-player">Edit Player</button>
                                 <button id="delete-player">Delete Player</button>
                                 <button id="export-roster">Export CSV</button>
                             </div>
@@ -113,7 +114,6 @@
                         <button id="export-roster">Export CSV</button>
                     </div>
                     <div class="roster-buttons">
-                        <button class="roster-button" id="ad">Admin Roster</button>
                         <button class="roster-button" id="full">Full Roster</button>
                         <button class="roster-button" id="off">Offense</button>
                         <button class="roster-button" id="def">Defense</button>

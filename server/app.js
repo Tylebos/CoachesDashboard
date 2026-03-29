@@ -3,15 +3,13 @@ import cookieParser from 'cookie-parser';
 import { 
     getRecord, getGames, getGameIDs, getTeams, addGame, deleteGame, editGame, findUserCreds, findUser, addRefreshToken,
     getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster, getOffensiveRoster,
-    getDefensiveRoster, loadPlayerID ,addPlayer, deletePlayer
+    getDefensiveRoster, loadPlayerID, loadPosIDs, addPlayer, deletePlayer, editPlayer
 } from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { error, log } from 'console';
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs';
-import { ref } from 'process';
 dotenv.config();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,6 +493,20 @@ app.get(`/api/players/:id/playerID`, async (req, res) => {
 })
 
 /**
+ * Event: GET
+ * Action: Fetch positions
+ */
+app.get(`/api/positions`, async (req, res) => {
+    try {
+        const posIDs = await loadPosIDs();
+        res.json(posIDs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Something went wrong getting positons" });
+    }
+})
+
+/**
  * Event: POST
  * Action: Post player to the postion table update PlayerPosition Join table
  */
@@ -530,6 +542,25 @@ app.delete('/api/players/:id/deletePlayer', async (req, res) => {
     } catch (error) {
        console.error(error);
         res.status(500).json({ error: 'Something went wrong deleting the player' });
+    }
+})
+
+/**
+ * Event: PUT
+ * Action: Edit Player in the Players table
+ */
+app.put('/api/players/:id/editPlayer', async (req, res) => {
+    const playerID = Number(req.params.id);
+    const playerData = req.body;
+
+    try {
+        const result = await editPlayer(playerID, playerData);
+        if (!result.success) {
+            return res.status(400).json({ error: result.message });
+        }
+        res.status(200).json({ message: "Player Updated" });
+    } catch (error) {
+        res.status(500).json({ error: 'Something went wrong updating the player' });
     }
 })
 

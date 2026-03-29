@@ -15,48 +15,49 @@
 import { checkAuth } from "./auth.js";
 let RosterTable;
 
-const adminColumns = [
-
-    {title: "Name", field: "Name", width: 200, resizable: false},
-    {title: "PlayerClass", field: "PlayerClass", width: 250, resizable: false},
-    {title: "PlayerPhone", field: "PlayerPhone", width: 150, resizable: false},
-    {title: "PlayerEmail", field: "PlayerEmail", width: 250, resizable: false},
-    {title: "PlayerAddress", field: "PlayerAddress", width: 150, resizable: false},
-    {title: "GPA", field: "PlayerGPA", width: 200, resizable: false},
-    {title: "Eligibility", field: "Eligibility", width: 150, resizable: false}
-];
-
 const fullrosterColumns = [
 
-    {title: "Name", field: "Name", width: 200, resizable: false},
-    {title: "PlayerJerseyNumber", field: "PlayerJerseyNumber", width: 250, resizable: false},
-    {title: "Position", field: "Position", width: 150, resizable: false},
-    {title: "SideOfBall", field: "SideOfBall", width: 250, resizable: false},
-    {title: "PlayerClass", field: "PlayerClass", width: 150, resizable: false},
-    {title: "Eligibility", field: "Eligibility", width: 150, resizable: false}
+    {title: "Name", field: "Name", width: 150, resizable: false},
+    {title: "Number", field: "PlayerJerseyNumber", width: 100, resizable: false},
+    {title: "Position", field: "Position", width: 125, resizable: false},
+    {title: "SideOfBall", field: "SideOfBall", width: 125, resizable: false},
+    {title: "Class", field: "PlayerClass", width: 100, resizable: false},
+    {title: "Phone", field: "PlayerPhone", width: 125, resizable: false},
+    {title: "Email", field: "PlayerEmail", width: 200, resizable: false},
+    {title: "Address", field: "PlayerAddress", width: 250, resizable: false},
+    {title: "GPA", field: "PlayerGPA", width: 50, resizable: false},
+    {title: "Eligibility", field: "Eligibility", width: 125, resizable: false}
 ];
 
 const offensiveRosterColumns = [
 
-    {title: "Name", field: "Name", width: 250, resizable: false},
-    {title: "PlayerJerseyNumber", field: "PlayerJerseyNumber", width: 200, resizable: false},
-    {title: "Position", field: "Position", width: 250, resizable: false},
-    {title: "PlayerClass", field: "PlayerClass", width: 200, resizable: false},
-    {title: "Eligibility", field: "Eligibility", width: 200, resizable: false}
+    {title: "Name", field: "Name", width: 175, resizable: false},
+    {title: "Number", field: "PlayerJerseyNumber", width: 100, resizable: false},
+    {title: "Position", field: "Position", width: 125, resizable: false},
+    {title: "Class", field: "PlayerClass", width: 100, resizable: false},
+    {title: "Phone", field: "PlayerPhone", width: 125, resizable: false},
+    {title: "Email", field: "PlayerEmail", width: 200, resizable: false},
+    {title: "Address", field: "PlayerAddress", width: 250, resizable: false},
+    {title: "GPA", field: "PlayerGPA", width: 100, resizable: false},
+    {title: "Eligibility", field: "Eligibility", width: 125, resizable: false}
 ];
 
 const defensiveRosterColumns = [
 
-    {title: "Name", field: "Name", width: 250, resizable: false},
-    {title: "PlayerJerseyNumber", field: "PlayerJerseyNumber", width: 200, resizable: false},
-    {title: "Position", field: "Position", width: 250, resizable: false},
-    {title: "PlayerClass", field: "PlayerClass", width: 200, resizable: false},
-    {title: "Eligibility", field: "Eligibility", width: 200, resizable: false}
+    {title: "Name", field: "Name", width: 175, resizable: false},
+    {title: "Number", field: "PlayerJerseyNumber", width: 100, resizable: false},
+    {title: "Position", field: "Position", width: 125, resizable: false},
+    {title: "Class", field: "PlayerClass", width: 100, resizable: false},
+    {title: "Phone", field: "PlayerPhone", width: 125, resizable: false},
+    {title: "Email", field: "PlayerEmail", width: 200, resizable: false},
+    {title: "Address", field: "PlayerAddress", width: 250, resizable: false},
+    {title: "GPA", field: "PlayerGPA", width: 100, resizable: false},
+    {title: "Eligibility", field: "Eligibility", width: 125, resizable: false}
 ];
 async function initRosterTable() {
     RosterTable = new Tabulator("#roster-table", {
         layout: "fitcolumns",
-        columns: adminColumns,
+        columns: fullrosterColumns,
         headerSort: false,
         rowFormatter: function(row){
             let data = row.getData();
@@ -67,24 +68,12 @@ async function initRosterTable() {
             }
         }
     });
+    RosterTable.on("rowClick", function(e, row) {
+        const playerData = row.getData();
+        openEditModal(playerData);
+    });
 }
-//
-async function loadAdminRoster(teamID) {
-    const accessToken = localStorage.getItem('accessToken');
-    try {
-        const res = await fetch(`/api/players/${teamID}/admin`, {
-            headers: { Authorization: accessToken }
-        });
-        if (!res.ok) {
-            throw new Error(`HTTP Error! ${res.status}`);
-        }
-        const players = await res.json();
-        RosterTable.setColumns(adminColumns);
-        RosterTable.setData(players);
-    } catch (error) {
-        
-    }
-}
+
 
 async function loadFullRoster(teamID) {
     const accessToken = localStorage.getItem('accessToken');
@@ -171,6 +160,41 @@ async function loadPlayerID() {
         console.error("Failed to load players", error);
     }
 }
+
+async function loadPositionIDs() {
+    const accessToken = localStorage.getItem('accessToken');
+
+
+    try {
+        const res = await fetch(`/api/positions`, {
+            headers: { Authorization: accessToken }
+        });
+        if (!res.ok) throw new Error(`HTTP Error! ${res.status}`);
+
+        const positionIDs = await res.json();
+        const select = document.getElementById('position');
+
+        // Clear existing options 
+        select.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.textContent = "Select Position";
+        defaultOption.value = "";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        select.appendChild(defaultOption);
+
+        // Populate the playes
+        positionIDs.forEach(id => {
+            const option = document.createElement("option");
+            option.value = id.PositionID;
+            option.textContent = id.Position;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Failed to load positions", error);
+    }
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Form
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,28 +240,44 @@ submitBTN.addEventListener('click', async () => {
        teamID,
        PlayerJerseyNumber: form.PlayerJerseyNumber.value,
        PlayerClass: form.Class.value,
-       PositionName: form.Position.value
+       PositionID: form.Position.value,
     };
-
+    let res;
     try {
-        const res = await fetch(`/api/players/${teamID}/addPlayer`, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-                Authorization: accessToken
-            },
-            body: JSON.stringify(playerData)
-        });
+        const isEditing = form.dataset.editingId;
+
+        if (isEditing) {
+            playerData.Old_Position = form.dataset.old_Position || null;
+            res = await fetch(`/api/players/${isEditing}/editPlayer`, {
+                method: "PUT",
+                headers: {  
+                    "Content-Type": "application/json",
+                    Authorization: accessToken
+                },
+                body: JSON.stringify(playerData)
+            });
+        } else {
+             res = await fetch(`/api/players/${teamID}/addPlayer`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: accessToken
+                },
+                body: JSON.stringify(playerData)
+            });
+        }
         if (!res.ok) throw new Error(`HTTP Error! ${res.status}`);
-        await loadAdminRoster(teamID);
+        await loadFullRoster(teamID);
     } catch (error) {
         console.error("Failed to add player", error);
     }
     form.reset();
     modal.style.display = 'none';
+    delete form.dataset.editingId;
+    delete form.dataset.old_Position;
 });
 
-let csv_name = 'AdminRoster.csv';
+let csv_name = 'FullRoster.csv';
 exportBTN.addEventListener('click', () => {
     RosterTable.download('csv', csv_name);
 });
@@ -268,8 +308,9 @@ deleteSubBTN.addEventListener('click', async () => {
         })
         if (!res.ok) throw new Error(`HTTP Error! ${res.status}`);
         console.log("Player deleted successfully");
-        await loadAdminRoster(teamID);
+        await loadFullRoster(teamID);
         await loadPlayerID();
+        await loadPositionIDs();
     } catch (error) {
         console.error("Failed to delete game", error);
     }
@@ -280,7 +321,24 @@ deleteSubBTN.addEventListener('click', async () => {
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Update Player
 ////////////////////////////////////////////////////////////////////////////////////////////
+function openEditModal(player) {
+    modal.style.display = "flex";
+    // Pre-fill form
+    form.PlayerFirstName.value = player.PlayerFirstName;
+    form.PlayerLastName.value = player.PlayerLastName;
+    form.PlayerAddress.value = player.PlayerAddress;
+    form.PlayerGPA.value = player.PlayerGPA;
+    form.PlayerPhone.value = player.PlayerPhone;
+    form.PlayerEmail.value = player.PlayerEmail;
+    form.PlayerJerseyNumber.value = player.PlayerJerseyNumber;
+    form.Class.value = player.PlayerClass;
+    form.Position.value = player.PositionID;
 
+    form.dataset.old_Position = player.PositionID;
+    form.dataset.editingId = player.PlayerID;
+    document.getElementById("player-title").textContent = "Edit Player";
+    submitBTN.textContent = "Update Player";
+}
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Init Page
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,19 +358,14 @@ async function initPage() {
     pageContainer.style.display = 'block';
 
     await initRosterTable();
-    await loadAdminRoster(teamID);
+    await loadFullRoster(teamID);
     await loadPlayerID();
+    await loadPositionIDs();
 
-    const adminBtn = document.getElementById("ad");
+
     const fullBtn = document.getElementById("full");
     const offBtn = document.getElementById("off");
     const defBtn = document.getElementById("def");
-
-
-    adminBtn.addEventListener("click", async () => {
-        csv_name = 'AdminRoster.csv'
-        await loadAdminRoster(teamID);
-    });
 
     fullBtn.addEventListener("click", async () => {
         csv_name = 'FullRoster.csv'

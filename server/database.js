@@ -203,12 +203,15 @@ export async function getGames(TeamID) {
 export async function getAdminRoster(teamID) {
     const query = `
         SELECT 
+            p.PlayerFirstName, 
+            p.PlayerLastName,
             CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
             p.PlayerClass,
             p.PlayerPhone,
             p.PlayerEmail,
             p.PlayerAddress,
             p.PlayerGPA,
+            p.PlayerJerseyNumber,
             CASE 
                 WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
                 ELSE 'ELIGIBLE'
@@ -222,12 +225,20 @@ export async function getAdminRoster(teamID) {
 
 export async function getFullRoster(teamID) {
     const query = `
-        SELECT 
+        SELECT
+            p.PlayerID,
+            p.PlayerFirstName, 
+            p.PlayerLastName,
             CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
             p.PlayerJerseyNumber,
+            ps.PositionID,
             ps.PositionName AS Position,
             ps.SideOfBall,
             p.PlayerClass,
+            p.PlayerPhone,
+            p.PlayerEmail,
+            p.PlayerAddress,
+            p.PlayerGPA,
             CASE 
                 WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
                 ELSE 'ELIGIBLE'
@@ -245,11 +256,19 @@ export async function getFullRoster(teamID) {
 
 export async function getOffensiveRoster(teamID) {
     const query = `
-        SELECT 
+        SELECT
+            p.PlayerID,
+            p.PlayerFirstName, 
+            p.PlayerLastName,
             CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
             p.PlayerJerseyNumber,
+            ps.PositionID,
             ps.PositionName AS Position,
             p.PlayerClass,
+            p.PlayerPhone,
+            p.PlayerEmail,
+            p.PlayerAddress,
+            p.PlayerGPA,
             CASE 
                 WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
                 ELSE 'ELIGIBLE'
@@ -259,7 +278,7 @@ export async function getOffensiveRoster(teamID) {
             on pp.PlayerID = p.PlayerID 
         INNER JOIN Positions ps
             on pp.PositionID = ps.PositionID 
-        WHERE ps.SideOfBall = 'Offense' AND p.TeamID = ?;
+        WHERE ps.SideOfBall = 'Offense' OR ps.SideOfBall = 'Both Ways' AND p.TeamID = ?;
     `;
     const [rows] = await pool.query(query, [teamID]);
     return rows;
@@ -268,11 +287,19 @@ export async function getOffensiveRoster(teamID) {
 export async function getDefensiveRoster(teamID) {
     const query = `
         SELECT 
+            p.PlayerID,
+            p.PlayerFirstName, 
+            p.PlayerLastName,
             CONCAT(p.PlayerFirstName, " ", p.PlayerLastName) AS Name,
             p.PlayerJerseyNumber,
+            ps.PositionID,
             ps.PositionName AS Position,
             ps.SideOfBall,
             p.PlayerClass,
+            p.PlayerPhone,
+            p.PlayerEmail,
+            p.PlayerAddress,
+            p.PlayerGPA,
             CASE 
                 WHEN p.PlayerGPA < 2.5 THEN 'INELIGIBLE'
                 ELSE 'ELIGIBLE'
@@ -282,7 +309,7 @@ export async function getDefensiveRoster(teamID) {
             on pp.PlayerID = p.PlayerID 
         INNER JOIN Positions ps
             on pp.PositionID = ps.PositionID 
-        WHERE ps.SideOfBall = 'Defense' AND p.TeamID = ?;
+        WHERE ps.SideOfBall = 'Defense' OR ps.SideOfBall = 'Both Ways' AND p.TeamID = ?;
     `;
     const [rows] = await pool.query(query, [teamID]);
     return rows;
@@ -305,6 +332,17 @@ export async function loadPlayerID(teamID) {
     const [ids] = await pool.query(query, [teamID]);
 
     return ids;
+}
+
+export async function loadPosIDs() {
+    const query = `
+        SELECT PositionID, PositionName as Position
+        FROM Positions;
+    `;
+
+    const [posIDs] = await pool.query(query);
+
+    return posIDs;
 }
 
 /**
@@ -338,12 +376,10 @@ export async function addPlayer(teamID, playerData) {
             const playerID = playerResult.insertId;
 
             const [positionResult] = await connection.execute(`
-                INSERT INTO PlayerPositions (PlayerID, PositionID)
-                SELECT ?, pos.PositionID
-                FROM Positions pos
-                WHERE PositionName = ?
+                    INSERT INTO PlayerPositions (PlayerID, PositionID)
+                    VALUES (?, ?)
                 `, 
-                [playerID, playerData.PositionName]
+                [playerID, playerData.PositionID]
             );
             if (positionResult.affectedRows === 0) {
                 throw new Error("Position not found");
@@ -375,6 +411,91 @@ export async function deletePlayer(playerID) {
     }
 
     return { success: true };
+}
+
+/**
+ * Function: editPlayer
+ * Purpose:
+ *      SQL query to update a player within the player table and positions
+ *      in the PlayerPosition table. A transaction is used in the case that the player's
+ *      position is changed.
+ * @param: playerID
+ * @return: success/fail JSON
+ */
+export async function editPlayer(playerID, playerData) {
+    const connection = await pool.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        // Update player info
+        const [playerUpdate] = await connection.execute(`
+            UPDATE Players
+            SET 
+                PlayerFirstName = ?, 
+                PlayerLastName = ?, 
+                PlayerAddress = ?, 
+                PlayerGPA = ?, 
+                PlayerPhone = ?, 
+                PlayerEmail = ?, 
+                PlayerJerseyNumber = ?,
+                PlayerClass = ?
+            WHERE PlayerID = ?;
+        `,[
+            playerData.PlayerFirstName,
+            playerData.PlayerLastName,
+            playerData.PlayerAddress,
+            playerData.PlayerGPA,
+            playerData.PlayerPhone,
+            playerData.PlayerEmail,
+            playerData.PlayerJerseyNumber,
+            playerData.PlayerClass,
+            playerID
+        ]);
+
+        // Get existing positions
+        const [existingPositions] = await connection.execute(`
+            SELECT PositionID
+            FROM PlayerPositions
+            WHERE PlayerID = ?  
+        `, [playerID]);
+
+        // Check if position already exists
+        const hasPosition = existingPositions.some(
+            p => Number(p.PositionID) === Number(playerData.PositionID)
+        );
+
+        let positionUpdateResult = { affectedRows: 1 };
+
+        if (Number(playerData.Old_Position) !== Number(playerData.PositionID)) {
+            // Remove the old position
+            await connection.execute(`
+                DELETE FROM PlayerPositions
+                WHERE PlayerID = ? AND PositionID = ?
+            `, [playerID, playerData.Old_Position]);
+        }
+            // Insert new position instead of updating all rows
+        if (!hasPosition) {
+            await connection.execute(`
+                INSERT INTO PlayerPositions (PlayerID, PositionID)
+                VALUES (?, ?)
+            `, [playerID, playerData.PositionID]);
+
+            positionUpdateResult.affectedRows = 1;
+        }
+        if (playerUpdate.affectedRows === 0) {
+            throw new Error("Player not updated");
+        }
+
+        await connection.commit();
+        return { success: true, message: "Player updated successfully" };
+
+    } catch(error) {
+        await connection.rollback();
+        return { success: false, message: error.message };
+    } finally {
+        connection.release();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
