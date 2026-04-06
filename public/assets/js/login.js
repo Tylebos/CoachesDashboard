@@ -1,3 +1,11 @@
+/**
+ * Author: Tyler Bosford
+ * Project: Coaches Dashboard
+ * File: login.js
+ * Description:
+ *       Front-end Javascript for logging into the page.
+ * github: Tylebos
+ */
 
 /**
  * Event: Load the login page

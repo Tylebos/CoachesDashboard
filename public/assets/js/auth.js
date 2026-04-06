@@ -1,8 +1,6 @@
 /**
  * Author: Tyler Bosford
  * Project: Coaches Dashboard
- * Date Started: 19 Jan 2026
- * Date Modified: 3 March 2026
  * File: home.js
  * Description:
  *          Authentication tools for all front end pages

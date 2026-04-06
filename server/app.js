@@ -3,7 +3,8 @@ import cookieParser from 'cookie-parser';
 import { 
     getRecord, getGames, getGameIDs, getTeams, addGame, deleteGame, editGame, findUserCreds, findUser, addRefreshToken,
     getRefreshToken, deleteRefreshToken, getAdminRoster, getFullRoster, getOffensiveRoster,
-    getDefensiveRoster, loadPlayerID, loadPosIDs, addPlayer, deletePlayer, editPlayer
+    getDefensiveRoster, loadPlayerID, loadPosIDs, addPlayer, deletePlayer, editPlayer, createUser,
+    loadUser
 } from './database.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -206,6 +207,14 @@ async function ensureAuthenticated(req, res, next) {
         return res.status(401).json({ message: "Access Token expired/not found"});
     }
 }
+
+function authorize(req, res, next) {
+    const userrole = req.user.userRole;
+    if (userrole !== 'Admin') {
+        return res.status(403).json({ message: "Access Denied" });
+    }
+    next();
+}
 /**
  * Event: GET
  * Action:
@@ -286,8 +295,38 @@ app.get('/users', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public' , 'pages', 'users.html'));
 });
 
+////////////////////////////////////////////////////////////////////////////////////////
+// USER QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
 
+app.post('/api/users/:id/addUser', ensureAuthenticated, authorize, async (req, res) => {
+    const TeamID = Number(req.params.id);
+    const userData = req.body;
+    try {
+        userData.Password = await bcrypt.hash(userData.Password, 10);
+        const result = await createUser(TeamID, userData);
+        if (!result.success) {
+            return res.status(400).json({ message: "Failed to add user to db "});
+        }
+        res.status(200).json(result); // {Success userID}
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+})
 
+app.get('/api/users/loadUser', ensureAuthenticated, async (req, res) => {
+    try {
+        const users = await loadUser();
+        if (!users) {
+            return res.status(400).json({ message: "No Users Found" });
+        }
+        res.status(200).json(users);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+})
 ////////////////////////////////////////////////////////////////////////////////////////
 // HOME QUERIES
 ////////////////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,6 @@
 /**
  * Author: Tyler Bosford
  * Project: Coaches Dashboard
- * Date Started: 19 Jan 2026
- * Date Modified: 8 March 2026
  * File: games.js
  * Description:
  *      Front-End JavaScript for the games page. Manage table and 

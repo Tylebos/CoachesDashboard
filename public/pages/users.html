@@ -2,9 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>CoachesPortal</title>
         <link rel="stylesheet" href="../assets/css/portal.css">
+        <link rel="stylesheet" href="../assets/css/users.css">
         <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
         <script src="https://unpkg.com/lucide@latest"></script>
         <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
@@ -13,33 +14,90 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     </head>
     <body class="portal-body">
-        <div class="team-logo">
-            <img src="../Images/DeltonaHighwolfheadsmall.webp" alt="Deltona Wolves Logo">
-            <h1>DELTONA WOLVES</h1>
-        </div>
-        <hr class="portal-headerdivider">
-        <div class="portal-layout">
-            <nav class="portal-sidepanel">
-                <a href="home" class="nav-item">
-                    <i data-lucide="house"></i> Home
-                </a>
-                <a href= "roster" class="nav-item">
-                    <i data-lucide="trophy"></i> Roster
-                </a>
-                <a href="schedule" class="nav-item">
-                    <i data-lucide="calendar-clock"></i>Schedule
-                </a>
-                <a href="stats" class="nav-item">
-                    <i data-lucide="chart-bar-big"></i> Stats
-                </a>
-                <a href="games" class="nav-item">
-                    <i data-lucide="medal"></i> Games
-                </a>
-                <a href="users"class="nav-item">
-                    <i data-lucide="user"></i> Users
-                </a>
-            </nav>
+        <div id="page-container" style="display: none;">
+            <div class="team-logo">
+                <img src="../Images/DeltonaHighwolfheadsmall.webp" alt="Deltona Wolves Logo">
+                <h1>DELTONA WOLVES</h1>
+            </div>
+            <hr class="portal-headerdivider">
+            <div class="portal-layout">
+                <nav class="portal-sidepanel">
+                    <a href="home" class="nav-item">
+                        <i data-lucide="house"></i> Home
+                    </a>
+                    <a href= "roster" class="nav-item">
+                        <i data-lucide="trophy"></i> Roster
+                    </a>
+                    <a href="schedule" class="nav-item">
+                        <i data-lucide="calendar-clock"></i>Schedule
+                    </a>
+                    <a href="stats" class="nav-item">
+                        <i data-lucide="chart-bar-big"></i> Stats
+                    </a>
+                    <a href="games" class="nav-item">
+                        <i data-lucide="medal"></i> Games
+                    </a>
+                    <a href="users"class="nav-item">
+                        <i data-lucide="user"></i> Users
+                    </a>
+                </nav>
+                <main class="users-main">
+                    <div id="user-modal" class="modal">
+                        <div class="modal-content">
+                            <h2 id="user-title">Add User</h2>
+                            <span class="close-btn">&times;</span>
+                            <form id="user-form">
+                                <label>Username:</label>
+                                <input type="text" name="UserName" required>
+                                <label>Email:</label>
+                                <input type="email" name="UserEmail" required>
+                                <label>Password:</label>
+                                <input type="password" name="UserPassword" required>
+                                <label>Role:</label>
+                                <select name="UserRole">
+                                    <option value="Coach">Coach</option>
+                                    <option value="Assistant Coach">Assistant Coach</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </form>
+                            <button type="submit" id="submit-btn">Add User</button>
+                            <button type="reset" id="reset-btn">Clear Values</button>
+                        </div>
+                    </div>
+                    <div id="delete-modal" class="modal">
+                        <div class="delete-modal-content">
+                            <span class="del-close-btn">&times;</span>
+                            <h2 id="delete-title">Delete User</h2>
+                            <form id="delete-form">
+                                <select id="user-select" name="UserID" required>
+                                    <option value="">Select User</option>
+                                </select>
+                            </form>
+                            <button type="button" id="delete-sub">Delete User</button>
+                        </div>
+                    </div>
+                    <h1 class="users-title">Users</h1>
+                    <div class="table-wrapper">
+
+                        <div class="menu-container">
+                            <button class="menu-button" id="menu-btn">
+                                <i data-lucide="ellipsis"></i>
+                            </button>
+
+                            <div class="menu-dropdown" id="menu-dropdown">
+                                <button id="open-modal-btn">Add User</button>
+                                <button id="delete-user">Delete User</button>
+                                <button id="export-users">Export CSV</button>
+                            </div>
+                        </div>
+
+                        <div id="user-table"></div>
+
+                    </div>
+                </main>
+            </div>
         </div>
         <script>lucide.createIcons();</script>
+        <script type="module" src="../assets/js/users.js"></script>
     </body>
 </html>

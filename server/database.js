@@ -9,6 +9,7 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise() // Allows for async functions
 
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // HOME QUERIES
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -535,6 +536,53 @@ export async function findUser(userID) {
     const [rows] = await pool.query(query, [userID]);
     return rows.length ? rows[0] : null;
 }
+
+/**
+ * Function: loadUser
+ * Purpose:
+ *      SQL query to find a user from the Users Table
+ * @param: valid user id
+ * @return: array of user data
+ */
+export async function loadUser() {
+    const query = `
+        SELECT UserName, UserEmail, UserRole
+        FROM Users
+    `;
+    const [rows] = await pool.query(query);
+    return rows
+}
+
+/**
+ * Function: createUser
+ * Purpose:
+ *      SQL Query to create a new user in the users table
+ * @param: teamID
+ * @return: Notification of success or failure JSON
+ */
+export async function createUser(teamID, userData) {
+    const query = `
+        INSERT INTO Users (teamID, UserName, UserRole, Password, UserEmail)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    const [row] = await pool.query(query, [
+        teamID,
+        userData.UserName,
+        userData.UserRole,
+        userData.Password,
+        userData.UserEmail
+    ]);
+
+    if (row.affectedRows === 0) {
+        return { success: false, message: "Failed to add user"};
+    }
+    return { success: true, insertId: row.insertId};
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+// REFRESH TABLE QUERIES
+////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Function: addRefreshToken

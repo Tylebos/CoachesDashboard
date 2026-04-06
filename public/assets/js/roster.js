@@ -1,8 +1,6 @@
 /**
  * Author: Tyler Bosford
  * Project: Coaches Dashboard
- * Date Started: 19 Jan 2026
- * Date Modified: 3 March 2026
  * File: roster.js
  * Description:
  *      Front-End JavaScript for the roster page. Manage table and 
